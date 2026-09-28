@@ -1,0 +1,77 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Media library{% endblock %}
+{% block heading %}Media library{% endblock %}
+
+{% block content %}
+<p class="dash-lede">
+  Every file stored on the server, with the content that uses it. Files are removed
+  automatically when you replace or delete the item they belong to — the list below
+  shows anything left over.
+</p>
+
+<div class="dash-stats">
+  <div class="dash-stat static">
+    <span class="dash-stat-icon"><i class="fa-solid fa-file"></i></span>
+    <b>{{ total_count }}</b><span>Files stored</span>
+  </div>
+  <div class="dash-stat static">
+    <span class="dash-stat-icon"><i class="fa-solid fa-hard-drive"></i></span>
+    <b>{{ total }}</b><span>Total size</span>
+  </div>
+  <div class="dash-stat static">
+    <span class="dash-stat-icon warn"><i class="fa-solid fa-broom"></i></span>
+    <b>{{ orphans|length }}</b><span>Unused files</span>
+  </div>
+</div>
+
+{% if orphans %}
+<section class="dash-card">
+  <div class="dash-card-head">
+    <h2>{{ orphans|length }} unused file{{ orphans|length|pluralize }}</h2>
+    <p>Nothing on the website points at these files. Removing them frees disk space.</p>
+  </div>
+  <div class="dash-card-body">
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="purge">
+      <button class="dash-btn danger" type="submit"
+              data-confirm="Delete {{ orphans|length }} unused file(s)? This cannot be undone.">
+        <i class="fa-solid fa-broom"></i> Delete all unused files
+      </button>
+    </form>
+  </div>
+</section>
+{% endif %}
+
+<section class="dash-card">
+  <div class="dash-table-wrap">
+    <table class="dash-table">
+      <thead>
+        <tr><th>File</th><th>Used by</th><th>Size</th><th class="right">Open</th></tr>
+      </thead>
+      <tbody>
+        {% for entry in entries %}
+        <tr>
+          <td>{{ entry.rel }}</td>
+          <td>
+            {% for usage in entry.used_by %}
+            <span class="dash-badge muted">{{ usage }}</span>
+            {% empty %}
+            <span class="dash-badge danger">Unused</span>
+            {% endfor %}
+          </td>
+          <td>{{ entry.size }}</td>
+          <td class="right">
+            <a class="dash-icon" href="{{ entry.url }}" target="_blank" rel="noopener" title="Open">
+              <i class="fa-solid fa-up-right-from-square"></i>
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="dash-empty"><p>No files uploaded yet.</p></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

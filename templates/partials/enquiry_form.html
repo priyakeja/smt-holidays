@@ -1,0 +1,87 @@
+{% comment %}
+Shared enquiry form.
+
+mode="full"   -> asks for destination, travel date and travelers (home page)
+mode="simple" -> name, email, phone and an optional message (contact page)
+
+The JavaScript rules in static/js/main.js read data-mode to decide which
+fields are mandatory; core/views.py mirrors that with require_trip.
+{% endcomment %}
+<form class="enquiry-form" id="{{ form_id|default:'leadForm' }}" novalidate
+      data-mode="{{ mode|default:'full' }}">
+  <input type="hidden" name="source" value="{{ source|default:'consultation form' }}">
+
+  <div class="row g-3">
+    <div class="col-md-6">
+      <label class="form-label" for="{{ form_id|default:'leadForm' }}-name">Full name</label>
+      <input class="form-control" id="{{ form_id|default:'leadForm' }}-name" name="full_name"
+             type="text" placeholder="Your name" minlength="3" maxlength="100"
+             autocomplete="name" required>
+      <div class="field-error small text-danger" data-error-for="full_name"></div>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="{{ form_id|default:'leadForm' }}-email">Email address</label>
+      <input class="form-control" id="{{ form_id|default:'leadForm' }}-email" name="email"
+             type="email" placeholder="yourname@example.com" maxlength="254"
+             autocomplete="email" required>
+      <div class="field-error small text-danger" data-error-for="email"></div>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="{{ form_id|default:'leadForm' }}-phone">Phone number</label>
+      <div class="input-group">
+        <span class="input-group-text">+91</span>
+        <input class="form-control" id="{{ form_id|default:'leadForm' }}-phone" name="phone"
+               type="tel" inputmode="numeric" maxlength="10" pattern="[6-9][0-9]{9}"
+               placeholder="10-digit mobile" autocomplete="tel-national" required>
+      </div>
+      <div class="field-error small text-danger" data-error-for="phone"></div>
+    </div>
+
+    {% if mode == 'full' %}
+    <div class="col-md-6">
+      <label class="form-label" for="{{ form_id|default:'leadForm' }}-dest">Destination</label>
+      <select class="form-select" id="{{ form_id|default:'leadForm' }}-dest"
+              name="destination" required>
+        <option value="">Select destination</option>
+        {% for destination in destinations %}<option>{{ destination }}</option>{% endfor %}
+        <option>Other</option>
+      </select>
+      <div class="field-error small text-danger" data-error-for="destination"></div>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="{{ form_id|default:'leadForm' }}-date">Travel date</label>
+      <input type="date" class="form-control" id="{{ form_id|default:'leadForm' }}-date"
+             name="travel_date" min="{{ today }}" required>
+      <div class="field-error small text-danger" data-error-for="travel_date"></div>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="{{ form_id|default:'leadForm' }}-trav">Number of travelers</label>
+      <input type="number" class="form-control" id="{{ form_id|default:'leadForm' }}-trav"
+             name="travelers" step="1" min="1" max="50" placeholder="How many travelers?" required>
+      <div class="field-error small text-danger" data-error-for="travelers"></div>
+    </div>
+    {% else %}
+    <div class="col-12">
+      <label class="form-label" for="{{ form_id|default:'leadForm' }}-msg">Your message</label>
+      <textarea class="form-control" id="{{ form_id|default:'leadForm' }}-msg" name="message"
+                rows="4" maxlength="2000" placeholder="How can we help you?"></textarea>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="form-msg small mt-3" role="status"></div>
+
+  <div class="d-flex flex-wrap gap-2 mt-3">
+    <button class="btn btn-accent flex-fill" type="submit">
+      <i class="fa-solid fa-paper-plane me-1"></i> {{ submit_label|default:'Send enquiry' }}
+    </button>
+    <a class="btn btn-outline-navy flex-fill" href="{{ SITE.whatsapp_url }}"
+       target="_blank" rel="noopener">
+      <i class="fa-brands fa-whatsapp me-1"></i> {{ whatsapp_label|default:'Chat on WhatsApp' }}
+    </a>
+  </div>
+</form>

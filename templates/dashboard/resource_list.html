@@ -1,0 +1,163 @@
+{% extends "dashboard/base.html" %}
+{% load site_extras %}
+{% block title %}{{ resource.plural }}{% endblock %}
+{% block heading %}{{ resource.plural }}{% endblock %}
+
+{% block actions %}
+{% if resource.slug == 'inquiries' %}
+<a class="dash-btn ghost" href="{% url 'dashboard:resource_export' resource.slug %}{% query_string %}">
+  <i class="fa-solid fa-file-csv"></i> Export CSV
+</a>
+{% endif %}
+<a class="dash-btn primary" href="{% url 'dashboard:resource_create' resource.slug %}">
+  <i class="fa-solid fa-plus"></i> {{ resource.add_label }}
+</a>
+{% endblock %}
+
+{% block content %}
+{% if resource.intro %}
+<p class="dash-lede">{{ resource.intro }}</p>
+{% endif %}
+
+{% if has_filters %}
+<form class="dash-filters" method="get">
+  {% if resource.search_fields %}
+  <div class="dash-search">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <input type="search" name="q" value="{{ query }}" placeholder="Search&hellip;" aria-label="Search">
+  </div>
+  {% endif %}
+
+  {% for filter in filters %}
+  <select name="{{ filter.name }}" aria-label="{{ filter.label }}">
+    {% for option in filter.options %}
+    <option value="{{ option.value }}" {% if option.value == filter.current %}selected{% endif %}>
+      {{ filter.label }}: {{ option.label }}
+    </option>
+    {% endfor %}
+  </select>
+  {% endfor %}
+
+  <button class="dash-btn ghost" type="submit"><i class="fa-solid fa-filter"></i> Apply</button>
+  <a class="dash-btn ghost" href="{{ request.path }}">Reset</a>
+</form>
+{% endif %}
+
+<section class="dash-card">
+  <div class="dash-card-head">
+    <h2>{{ total }} item{{ total|pluralize }}</h2>
+  </div>
+
+  <div class="dash-table-wrap">
+    <table class="dash-table">
+      <thead>
+        <tr>
+          {% for column in resource.columns %}
+          <th class="{% if column.kind == 'bool' %}center{% endif %}">{{ column.label|default:column.name }}</th>
+          {% endfor %}
+          <th class="right">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          {% for cell in row.cells %}
+          <td class="{% if cell.kind == 'bool' %}center{% endif %} col-{{ cell.kind }}">
+            {% if cell.kind == 'image' %}
+              {% if cell.image %}<img class="dash-thumb" src="{{ cell.image }}" alt="">{% else %}<span class="dash-muted">—</span>{% endif %}
+
+            {% elif cell.kind == 'bool' %}
+              {% if resource.toggle_field %}
+              <form method="post" action="{% url 'dashboard:resource_toggle' resource.slug row.obj.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="dash-toggle {% if cell.bool %}on{% else %}off{% endif %}"
+                        title="Click to {% if cell.bool %}hide{% else %}show{% endif %}">
+                  <i class="fa-solid {% if cell.bool %}fa-toggle-on{% else %}fa-toggle-off{% endif %}"></i>
+                </button>
+              </form>
+              {% else %}
+                <i class="fa-solid {% if cell.bool %}fa-circle-check text-success{% else %}fa-circle-xmark text-muted{% endif %}"></i>
+              {% endif %}
+
+            {% elif cell.kind == 'stars' %}
+              <span class="dash-stars">
+                {% for i in cell.stars %}
+                <i class="fa-{% if forloop.counter <= cell.rating %}solid{% else %}regular{% endif %} fa-star"></i>
+                {% endfor %}
+              </span>
+
+            {% elif cell.url %}
+              <a href="{{ cell.url }}" target="_blank" rel="noopener">{{ cell.text }}</a>
+
+            {% elif cell.tone %}
+              <span class="dash-badge {{ cell.tone }}">{{ cell.text }}</span>
+
+            {% elif cell.primary %}
+              <a class="dash-strong" href="{% url 'dashboard:resource_update' resource.slug row.obj.pk %}">{{ cell.text }}</a>
+
+            {% else %}
+              {{ cell.text }}
+            {% endif %}
+          </td>
+          {% endfor %}
+
+          <td class="right">
+            <div class="dash-actions">
+              {% if resource.orderable %}
+              <form method="post" action="{% url 'dashboard:resource_move' resource.slug row.obj.pk %}">
+                {% csrf_token %}
+                <input type="hidden" name="direction" value="up">
+                <button class="dash-icon" type="submit" title="Move up"><i class="fa-solid fa-arrow-up"></i></button>
+              </form>
+              <form method="post" action="{% url 'dashboard:resource_move' resource.slug row.obj.pk %}">
+                {% csrf_token %}
+                <input type="hidden" name="direction" value="down">
+                <button class="dash-icon" type="submit" title="Move down"><i class="fa-solid fa-arrow-down"></i></button>
+              </form>
+              {% endif %}
+
+              {% if resource.detail and resource.slug == 'inquiries' %}
+              <a class="dash-icon" href="{% url 'dashboard:inquiry_detail' row.obj.pk %}" title="Open"><i class="fa-solid fa-eye"></i></a>
+              {% endif %}
+
+              <a class="dash-icon" href="{% url 'dashboard:resource_update' resource.slug row.obj.pk %}" title="Edit">
+                <i class="fa-solid fa-pen"></i>
+              </a>
+              <a class="dash-icon danger" href="{% url 'dashboard:resource_delete' resource.slug row.obj.pk %}" title="Delete">
+                <i class="fa-solid fa-trash"></i>
+              </a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="{{ resource.columns|length|add:1 }}" class="dash-empty">
+            <i class="fa-regular fa-folder-open"></i>
+            <p>Nothing here yet.</p>
+            <a class="dash-btn primary" href="{% url 'dashboard:resource_create' resource.slug %}">
+              <i class="fa-solid fa-plus"></i> {{ resource.add_label }}
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if page.has_other_pages %}
+  <div class="dash-pager">
+    {% if page.has_previous %}
+    <a class="dash-btn ghost" href="{% query_string page=page.previous_page_number %}">
+      <i class="fa-solid fa-arrow-left"></i> Previous
+    </a>
+    {% endif %}
+    <span>Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+    {% if page.has_next %}
+    <a class="dash-btn ghost" href="{% query_string page=page.next_page_number %}">
+      Next <i class="fa-solid fa-arrow-right"></i>
+    </a>
+    {% endif %}
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Section images{% endblock %}
+{% block heading %}Section images{% endblock %}
+
+{% block actions %}
+<a class="dash-btn ghost" href="{% url 'dashboard:media' %}">
+  <i class="fa-solid fa-folder-open"></i> Media library
+</a>
+{% endblock %}
+
+{% block content %}
+<p class="dash-lede">
+  Hero and banner artwork. Uploading a replacement deletes the previous file from
+  the server automatically, so unused images never pile up.
+</p>
+
+<form method="post" enctype="multipart/form-data" class="dash-form" novalidate>
+  {% csrf_token %}
+
+  {% for group in groups %}
+  <section class="dash-card">
+    <div class="dash-card-head"><h2>{{ group.title }}</h2></div>
+    <div class="dash-card-body">
+      <div class="dash-grid">
+        {% for entry in group.entries %}
+        <div class="dash-image-block">
+          <div class="dash-image-preview">
+            {% if entry.current %}
+            <img src="{{ entry.current }}" alt="">
+            {% else %}
+            <span class="dash-muted"><i class="fa-regular fa-image"></i> No image yet</span>
+            {% endif %}
+          </div>
+
+          <label class="dash-label" for="{{ entry.image.id_for_label }}">{{ entry.block.label }}</label>
+          {{ entry.image }}
+          {% if entry.block.help_text %}<div class="dash-help">{{ entry.block.help_text }}</div>{% endif %}
+          {% for error in entry.image.errors %}<div class="dash-error">{{ error }}</div>{% endfor %}
+
+          <label class="dash-label mt-2" for="{{ entry.alt.id_for_label }}">Alt text</label>
+          {{ entry.alt }}
+
+          {% if entry.current %}
+          <div class="form-check mt-2">
+            {{ entry.clear }}
+            <label class="form-check-label" for="{{ entry.clear.id_for_label }}">Remove current image</label>
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endfor %}
+
+  <div class="dash-savebar">
+    <button class="dash-btn primary" type="submit">
+      <i class="fa-solid fa-floppy-disk"></i> Save images
+    </button>
+  </div>
+</form>
+{% endblock %}

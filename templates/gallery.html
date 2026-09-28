@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load site_extras %}
+{% block title %}{{ TEXT.gallery_title }} | {{ SITE.site_name }}{% endblock %}
+{% block meta_description %}{{ TEXT.gallery_subtitle }}{% endblock %}
+
+{% block content %}
+{% include "partials/page_banner.html" with banner_title=TEXT.gallery_title banner_subtitle=TEXT.gallery_subtitle banner_image=IMG.gallery_banner.url %}
+
+<section class="section">
+  <div class="container">
+    {% if gallery_categories %}
+    <div class="filter-bar mb-4">
+      <div class="d-flex flex-wrap gap-2">
+        <a class="chip {% if not selected_category %}active{% endif %}" href="{% url 'gallery' %}">
+          All photos
+        </a>
+        {% for category in gallery_categories %}
+        <a class="chip {% if selected_category == category %}active{% endif %}"
+           href="{% url 'gallery' %}?category={{ category|urlencode }}">{{ category }}</a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="masonry">
+      {% for image in gallery %}
+      <figure class="reveal">
+        <a href="{{ image.image.url }}" target="_blank" rel="noopener">
+          <img src="{{ image.image.url }}" alt="{{ image.caption|default:'Travel photo' }}" loading="lazy">
+        </a>
+        {% if image.caption %}<figcaption>{{ image.caption }}</figcaption>{% endif %}
+      </figure>
+      {% empty %}
+      <p class="text-muted text-center w-100">{{ TEXT.no_results_text }}</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

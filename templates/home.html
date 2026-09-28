@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+{% load static site_extras %}
+{% block content %}
+
+<!-- HERO -->
+<header class="hero{% if hero_slides %} hero-carousel{% endif %}" id="top">
+  {% if hero_slides %}
+  <div id="heroSlides" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="6500">
+    <div class="carousel-inner">
+      {% for slide in hero_slides %}
+      <div class="carousel-item {% if forloop.first %}active{% endif %}">
+        <div class="hero-bg" style="background-image:url('{{ slide.image.url }}')"></div>
+        <div class="container hero-inner">
+          {% include "partials/hero_content.html" with slide=slide %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% else %}
+  {% if IMG.hero_bg.url %}
+  <div class="hero-bg" style="background-image:url('{{ IMG.hero_bg.url }}')"></div>
+  {% endif %}
+  <div class="container hero-inner">
+    {% include "partials/hero_content.html" %}
+  </div>
+  {% endif %}
+</header>
+
+<!-- SEARCH BAR -->
+<div class="container search-wrap">
+  <form class="search-card" id="searchForm">
+    <div class="row g-3 align-items-end">
+      <div class="col-md-4">
+        <label for="sDest"><i class="fa-solid fa-location-dot"></i> {{ TEXT.search_destination_label }}</label>
+        <select class="form-select" id="sDest" required>
+          <option value="">{{ TEXT.search_destination_placeholder }}</option>
+          {% for destination in destinations %}<option>{{ destination }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label for="sDate"><i class="fa-regular fa-calendar"></i> {{ TEXT.search_date_label }}</label>
+        <input type="date" class="form-control" id="sDate" min="{{ today }}" required>
+      </div>
+      <div class="col-md-3">
+        <label for="sTrav"><i class="fa-solid fa-user-group"></i> {{ TEXT.search_travelers_label }}</label>
+        <select class="form-select" id="sTrav" required>
+          <option value="">{{ TEXT.search_travelers_placeholder }}</option>
+          {% for n in "12345678" %}
+          <option value="{{ n }}">{{ n }} Traveler{{ n|pluralize }}</option>
+          {% endfor %}
+          <option value="10">10+ Travelers</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button class="btn btn-accent w-100 py-2" type="submit">
+          <i class="fa-solid fa-magnifying-glass me-1"></i> {{ TEXT.search_button_label }}
+        </button>
+      </div>
+    </div>
+    <div id="searchMsg" class="small mt-2"></div>
+  </form>
+
+  <div class="rating-card mt-4">
+    <div class="d-flex align-items-center gap-3">
+      <span class="g-logo">G</span>
+      <div>
+        <div class="stars">
+          {% for i in "12345" %}<i class="fa-solid fa-star"></i>{% endfor %}
+          <b>{{ TEXT.rating_score }}</b> / 5
+        </div>
+        <small class="text-muted">{{ TEXT.rating_text }}</small>
+      </div>
+    </div>
+    <div class="d-none d-md-flex gap-4 small text-muted">
+      {% for badge in trust_badges %}
+      <span><i class="{{ badge.icon }} text-accent"></i> {{ badge.text }}</span>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about" class="section">
+  <div class="container">
+    <div class="row g-5 align-items-center">
+      <div class="col-lg-6 reveal">
+        <div class="eyebrow">{{ TEXT.about_eyebrow }}</div>
+        <h2>{{ TEXT.about_title }}</h2>
+        <div class="text-muted rich-text">{{ TEXT.about_paragraph|rich }}</div>
+        {% if about_points %}
+        <ul class="check-list">
+          {% for point in about_points %}
+          <li><i class="{{ point.icon|default:'fa-solid fa-check' }}"></i> {{ point.text }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+        {% if downloads %}
+        <div class="d-flex flex-wrap gap-2 mt-4">
+          {% for file in downloads %}
+          <a class="btn btn-outline-navy btn-sm" href="{{ file.file.url }}" download>
+            <i class="fa-solid fa-file-arrow-down me-1"></i> {{ file.title }}
+            {% if file.extension %}<span class="badge text-bg-light ms-1">{{ file.extension }}</span>{% endif %}
+          </a>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="col-lg-6 reveal">
+        {% if IMG.about_image.url %}
+        <figure class="about-figure">
+          <img src="{{ IMG.about_image.url }}" alt="{{ IMG.about_image.alt }}" loading="lazy">
+          {% if TEXT.about_image_caption %}<figcaption>{{ TEXT.about_image_caption }}</figcaption>{% endif %}
+        </figure>
+        {% endif %}
+        {% if stats %}
+        <div class="row g-3">
+          {% for stat in stats %}
+          <div class="col-6">
+            <div class="stat">
+              {% if stat.number is not None %}
+              <b data-count="{{ stat.number }}" data-suffix="{{ stat.suffix }}">{{ stat.display }}</b>
+              {% else %}
+              <b>{{ stat.display }}</b>
+              {% endif %}
+              <span>{{ stat.label }}</span>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+{% if steps %}
+<section id="how" class="section bg-soft">
+  <div class="container text-center">
+    <h2 class="reveal">{{ TEXT.how_title }}</h2>
+    <p class="text-muted mb-5">{{ TEXT.how_subtitle }}</p>
+    <div class="row g-4">
+      {% for step in steps %}
+      <div class="col-md-6 col-lg-3 reveal">
+        <div class="step-card">
+          <span class="step-no">{{ step.number }}</span>
+          <i class="{{ step.icon }}"></i>
+          <h5>{{ step.title }}</h5>
+          <div class="step-text">{{ step.description|rich }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <a href="{{ HOW_CTA }}" class="btn btn-accent mt-5 px-4">{{ TEXT.how_cta_label }}</a>
+  </div>
+</section>
+{% endif %}
+
+<!-- PACKAGES -->
+<section id="packages" class="section">
+  <div class="container text-center">
+    <div class="eyebrow">{{ TEXT.packages_eyebrow }}</div>
+    <h2>{{ TEXT.packages_title }}</h2>
+    <p class="text-muted mb-5">{{ TEXT.packages_subtitle }}</p>
+
+    <div class="row g-4 text-start" id="pkgGrid">
+      {% for package in packages %}
+      <div class="col-md-6 col-lg-4 pkg-col reveal" data-cat="{{ package.category }}">
+        {% include "partials/package_card.html" with package=package %}
+      </div>
+      {% empty %}
+      <p class="text-center text-muted">{{ TEXT.packages_empty }}</p>
+      {% endfor %}
+    </div>
+
+    <a href="{% url 'packages' %}" class="btn btn-outline-navy mt-5 px-4">
+      View all packages <i class="fa-solid fa-arrow-right ms-1"></i>
+    </a>
+  </div>
+</section>
+
+<!-- WHY US -->
+{% if services %}
+<section class="section bg-soft">
+  <div class="container text-center">
+    <div class="eyebrow">{{ TEXT.why_eyebrow }}</div>
+    <h2 class="mb-5">{{ TEXT.why_title }}</h2>
+    <div class="row g-4 text-start">
+      {% for service in services %}
+      <div class="col-md-6 col-lg-3 reveal">
+        <div class="why">
+          <i class="{{ service.icon }}"></i>
+          <h6>{{ service.title }}</h6>
+          <div class="why-text">{{ service.description|rich }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- GALLERY -->
+{% if gallery %}
+<section id="gallery" class="section">
+  <div class="container text-center">
+    <h2>{{ TEXT.gallery_title }}</h2>
+    <p class="text-muted mb-5">{{ TEXT.gallery_subtitle }}</p>
+    <div class="masonry">
+      {% for image in gallery %}
+      <figure class="reveal">
+        <img src="{{ image.image.url }}" alt="{{ image.caption|default:'Travel photo' }}" loading="lazy">
+        {% if image.caption %}<figcaption>{{ image.caption }}</figcaption>{% endif %}
+      </figure>
+      {% endfor %}
+    </div>
+    <a href="{% url 'gallery' %}" class="btn btn-outline-navy mt-5 px-4">
+      Open full gallery <i class="fa-solid fa-arrow-right ms-1"></i>
+    </a>
+  </div>
+</section>
+{% endif %}
+
+<!-- TESTIMONIALS -->
+{% if testimonials %}
+<section class="section bg-soft">
+  <div class="container text-center">
+    <h2 class="mb-5">{{ TEXT.testimonials_title }}</h2>
+    <div class="row g-4 text-start">
+      {% for testimonial in testimonials %}
+      <div class="col-md-4 reveal">
+        {% include "partials/testimonial_card.html" with testimonial=testimonial %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ENQUIRY -->
+<section id="enquiry" class="section">
+  <div class="container">
+    <div class="consult row g-0">
+      <div class="col-lg-5 consult-left"
+           {% if IMG.cta_bg.url %}style="background-image:linear-gradient(rgba(2,52,70,.85),rgba(2,52,70,.92)),url('{{ IMG.cta_bg.url }}');background-size:cover"{% endif %}>
+        <div class="eyebrow text-accent">{{ TEXT.consult_eyebrow }}</div>
+        <h2 class="text-white">{{ TEXT.consult_title }}</h2>
+        <div class="rich-text">{{ TEXT.consult_paragraph|rich }}</div>
+        {% if consult_points %}
+        <ul class="list-unstyled small">
+          {% for point in consult_points %}
+          <li><i class="{{ point.icon|default:'fa-regular fa-circle-check' }} me-2"></i>{{ point.text }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+      <div class="col-lg-7 p-4 p-lg-5">
+        {% include "partials/enquiry_form.html" with mode="full" source="consultation form" submit_label=TEXT.consult_submit_label whatsapp_label=TEXT.consult_whatsapp_label %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+{% if faqs %}
+<section id="faq" class="section bg-soft">
+  <div class="container" style="max-width:820px">
+    <div class="text-center mb-5">
+      <div class="eyebrow">{{ TEXT.faq_eyebrow }}</div>
+      <h2>{{ TEXT.faq_title }}</h2>
+    </div>
+    <div class="accordion" id="faqAcc">
+      {% for faq in faqs %}
+      <div class="accordion-item">
+        <h3 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                  data-bs-target="#faq{{ faq.id }}" aria-expanded="false">
+            {{ faq.question }}
+          </button>
+        </h3>
+        <div id="faq{{ faq.id }}" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
+          <div class="accordion-body text-muted rich-text">{{ faq.answer|rich }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- SEO STRIP -->
+<section class="section text-center">
+  <div class="container" style="max-width:900px">
+    <h2>{{ TEXT.seo_heading }}</h2>
+    <div class="text-muted rich-text">{{ TEXT.seo_paragraph|rich }}</div>
+    <div class="d-flex flex-wrap gap-2 justify-content-center">
+      {% for destination in destinations %}<span class="kw">{{ destination }} Tour Packages</span>{% endfor %}
+      <span class="kw">Travel Agency in Sankarankovil</span>
+      <span class="kw">Temple Tour Packages</span>
+      <span class="kw">Customized Travel Packages</span>
+    </div>
+  </div>
+</section>
+
+{% include "partials/package_modal.html" %}
+{% endblock %}

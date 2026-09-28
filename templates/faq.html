@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load site_extras %}
+{% block title %}{{ TEXT.faq_title }} | {{ SITE.site_name }}{% endblock %}
+{% block meta_description %}{{ TEXT.faq_title }} about {{ SITE.site_name }} tour packages and travel services.{% endblock %}
+
+{% block content %}
+{% include "partials/page_banner.html" with banner_title=TEXT.faq_title banner_subtitle=TEXT.faq_eyebrow banner_image=IMG.faq_banner.url %}
+
+<section class="section">
+  <div class="container" style="max-width:820px">
+    <div class="accordion" id="faqAcc">
+      {% for faq in faqs %}
+      <div class="accordion-item">
+        <h3 class="accordion-header">
+          <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button"
+                  data-bs-toggle="collapse" data-bs-target="#faq{{ faq.id }}"
+                  aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}">
+            {{ faq.question }}
+          </button>
+        </h3>
+        <div id="faq{{ faq.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}"
+             data-bs-parent="#faqAcc">
+          <div class="accordion-body text-muted rich-text">{{ faq.answer|rich }}</div>
+        </div>
+      </div>
+      {% empty %}
+      <p class="text-muted text-center">{{ TEXT.no_results_text }}</p>
+      {% endfor %}
+    </div>
+
+    <div class="text-center mt-5">
+      <h4>Still have a question?</h4>
+      <p class="text-muted">Talk to a real person — we reply within an hour.</p>
+      <div class="d-flex flex-wrap gap-2 justify-content-center">
+        <a class="btn btn-accent" href="{{ CONSULT_ANCHOR }}">
+          <i class="fa-solid fa-paper-plane me-1"></i> {{ TEXT.consult_submit_label }}
+        </a>
+        <a class="btn btn-outline-navy" href="{{ SITE.call_url }}">
+          <i class="fa-solid fa-phone me-1"></i> {{ SITE.phone_display }}
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

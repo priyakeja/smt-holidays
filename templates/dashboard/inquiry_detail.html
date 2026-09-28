@@ -1,0 +1,63 @@
+{% extends "dashboard/base.html" %}
+{% load site_extras %}
+{% block title %}Enquiry #{{ inquiry.pk }}{% endblock %}
+{% block heading %}Enquiry #{{ inquiry.pk }}{% endblock %}
+
+{% block actions %}
+<a class="dash-btn ghost" href="{% url 'dashboard:resource_list' 'inquiries' %}">
+  <i class="fa-solid fa-arrow-left"></i> All enquiries
+</a>
+<a class="dash-btn danger" href="{% url 'dashboard:resource_delete' 'inquiries' inquiry.pk %}">
+  <i class="fa-solid fa-trash"></i> Delete
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="dash-columns">
+  <section class="dash-card">
+    <div class="dash-card-head">
+      <h2>{{ inquiry.full_name }}</h2>
+      <p>Received {{ inquiry.created_at|date:"d M Y, H:i" }} &bull; {{ inquiry.source }}</p>
+    </div>
+    <div class="dash-card-body">
+      <div class="dash-quick mb-4">
+        <a href="tel:+{{ inquiry.phone }}"><i class="fa-solid fa-phone"></i> Call</a>
+        <a href="mailto:{{ inquiry.email }}"><i class="fa-regular fa-envelope"></i> Email</a>
+        <a href="https://wa.me/91{{ inquiry.phone }}?text={{ inquiry.full_name|urlencode }}"
+           target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
+      </div>
+
+      <dl class="dash-details">
+        <dt>Phone</dt><dd>{{ inquiry.phone }}</dd>
+        <dt>Email</dt><dd>{{ inquiry.email }}</dd>
+        <dt>Destination</dt><dd>{{ inquiry.destination|default:"—" }}</dd>
+        <dt>Travel date</dt><dd>{{ inquiry.travel_date|date:"d M Y"|default:"—" }}</dd>
+        <dt>Travelers</dt><dd>{{ inquiry.travelers }}</dd>
+        <dt>Message</dt><dd>{{ inquiry.message|default:"—"|linebreaksbr }}</dd>
+      </dl>
+    </div>
+  </section>
+
+  <section class="dash-card">
+    <div class="dash-card-head">
+      <h2>Manage</h2>
+      <p>Update the status and keep notes for your team.</p>
+    </div>
+    <div class="dash-card-body">
+      <form method="post" class="dash-form" novalidate>
+        {% csrf_token %}
+        {% for group in form.grouped_fields %}
+          {% for field in group.fields %}
+          {% include "dashboard/partials/field.html" with field=field %}
+          {% endfor %}
+        {% endfor %}
+        <div class="dash-savebar">
+          <button class="dash-btn primary" type="submit">
+            <i class="fa-solid fa-floppy-disk"></i> Save enquiry
+          </button>
+        </div>
+      </form>
+    </div>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load site_extras %}
+{% block title %}{{ TEXT.contact_title }} | {{ SITE.site_name }}{% endblock %}
+{% block meta_description %}{{ TEXT.contact_subtitle }}{% endblock %}
+
+{% block content %}
+{% include "partials/page_banner.html" with banner_title=TEXT.contact_title banner_subtitle=TEXT.contact_subtitle banner_image=IMG.contact_banner.url %}
+
+<section class="section">
+  <div class="container">
+    <div class="row g-4 mb-5">
+      {% for method in contact_methods %}
+      <div class="col-md-6 col-lg-3">
+        <div class="contact-card">
+          <i class="{{ method.icon }}"></i>
+          <h6>{{ method.title }}</h6>
+          {% with link=method.get_link %}
+            {% if link %}
+            <a href="{{ link }}">{{ method.display_value }}</a>
+            {% else %}
+            <span>{{ method.display_value }}</span>
+            {% endif %}
+          {% endwith %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="row g-5">
+      <div class="col-lg-6">
+        <h2 class="mb-3">{{ TEXT.consult_title }}</h2>
+        <div class="text-muted rich-text">{{ TEXT.consult_paragraph|rich }}</div>
+        <div class="contact-panel">
+          {% include "partials/enquiry_form.html" with form_id="contactForm" mode="simple" source="contact form" submit_label="Send message" whatsapp_label=TEXT.consult_whatsapp_label %}
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="map-wrap">
+          <iframe title="Map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                  src="https://www.google.com/maps?q={{ TEXT.contact_map_query|urlencode }}&output=embed">
+          </iframe>
+        </div>
+        {% if consult_points %}
+        <ul class="check-list mt-4">
+          {% for point in consult_points %}
+          <li><i class="{{ point.icon|default:'fa-solid fa-check' }}"></i> {{ point.text }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

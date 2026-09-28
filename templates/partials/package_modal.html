@@ -1,0 +1,33 @@
+<div class="modal fade" id="pkgModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content pkg-modal">
+      <button type="button" class="btn-close-round" data-bs-dismiss="modal" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <img id="mImg" class="modal-hero" alt="">
+      <div class="pkg-modal-body">
+        <h3 class="d-flex align-items-center gap-2 flex-wrap">
+          <span id="mTitle"></span><span class="badge-dur" id="mDur"></span>
+        </h3>
+        <p class="modal-sub">
+          <i class="fa-solid fa-location-dot me-1"></i> {{ SITE.site_name }} &bull; Customizable
+        </p>
+        <a id="mFull" class="btn btn-sm btn-outline-navy mt-2" href="#">
+          View full page <i class="fa-solid fa-arrow-right ms-1"></i>
+        </a>
+        <div class="row g-4 mt-1 mb-0">
+          <div class="col-md-6"><h6>Highlights</h6><ul class="tick tick-orange" id="mHigh"></ul></div>
+          <div class="col-md-6"><h6>Inclusions</h6><ul class="tick tick-navy" id="mInc"></ul></div>
+        </div>
+        <div class="price-box">
+          <small>Starting from</small>
+          <div><b id="mPrice"></b> <span class="per">/ person</span></div>
+        </div>
+        <div class="d-flex flex-wrap justify-content-end gap-2 mt-4">
+          <a id="mWa" class="btn btn-outline-navy" target="_blank" rel="noopener">Chat on WhatsApp</a>
+          <a id="mQuote" class="btn btn-accent" href="{{ CONSULT_ANCHOR }}">{{ TEXT.hero_cta_label }}</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

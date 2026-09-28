@@ -1,0 +1,117 @@
+{% extends "dashboard/base.html" %}
+{% load site_extras %}
+{% block title %}Overview{% endblock %}
+{% block heading %}Overview{% endblock %}
+
+{% block actions %}
+<a class="dash-btn ghost" href="{% url 'home' %}" target="_blank" rel="noopener">
+  <i class="fa-solid fa-globe"></i> View website
+</a>
+<a class="dash-btn primary" href="{% url 'dashboard:resource_create' 'packages' %}">
+  <i class="fa-solid fa-plus"></i> Add package
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="dash-stats">
+  <a class="dash-stat" href="{% url 'dashboard:resource_list' 'inquiries' %}">
+    <span class="dash-stat-icon info"><i class="fa-solid fa-inbox"></i></span>
+    <b>{{ new_enquiries }}</b>
+    <span>New enquiries</span>
+  </a>
+  <a class="dash-stat" href="{% url 'dashboard:resource_list' 'packages' %}">
+    <span class="dash-stat-icon"><i class="fa-solid fa-suitcase-rolling"></i></span>
+    <b>{{ stats.published }}</b>
+    <span>Published packages</span>
+  </a>
+  <a class="dash-stat" href="{% url 'dashboard:resource_list' 'gallery' %}">
+    <span class="dash-stat-icon"><i class="fa-solid fa-images"></i></span>
+    <b>{{ stats.gallery }}</b>
+    <span>Gallery photos</span>
+  </a>
+  <a class="dash-stat" href="{% url 'dashboard:resource_list' 'testimonials' %}">
+    <span class="dash-stat-icon"><i class="fa-solid fa-star"></i></span>
+    <b>{{ stats.reviews }}</b>
+    <span>Reviews</span>
+  </a>
+</div>
+
+<div class="dash-columns">
+  <section class="dash-card">
+    <div class="dash-card-head">
+      <h2>Latest enquiries</h2>
+      <a class="dash-link-inline" href="{% url 'dashboard:resource_list' 'inquiries' %}">View all</a>
+    </div>
+    <div class="dash-table-wrap">
+      <table class="dash-table">
+        <thead>
+          <tr><th>Name</th><th>Destination</th><th>Status</th><th>Received</th></tr>
+        </thead>
+        <tbody>
+          {% for inquiry in recent %}
+          <tr>
+            <td>
+              <a class="dash-strong" href="{% url 'dashboard:inquiry_detail' inquiry.pk %}">{{ inquiry.full_name }}</a>
+              <br><small class="dash-muted">{{ inquiry.phone }}</small>
+            </td>
+            <td>{{ inquiry.destination|default:"—" }}</td>
+            <td><span class="dash-badge {{ inquiry.status_tone }}">{{ inquiry.get_status_display }}</span></td>
+            <td>{{ inquiry.created_at|date:"d M Y, H:i" }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4" class="dash-empty"><p>No enquiries yet.</p></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="dash-column">
+    <section class="dash-card">
+      <div class="dash-card-head"><h2>Setup checklist</h2></div>
+      <div class="dash-card-body">
+        <ul class="dash-checklist">
+          {% for label, done, url in checklist %}
+          <li class="{% if done %}done{% endif %}">
+            <i class="fa-solid {% if done %}fa-circle-check{% else %}fa-circle{% endif %}"></i>
+            {% if done %}{{ label }}{% else %}<a href="{{ url }}">{{ label }}</a>{% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </section>
+
+    {% if missing_images %}
+    <section class="dash-card">
+      <div class="dash-card-head">
+        <h2>Images to add</h2>
+        <p>These sections look better with a picture. Everything else already has sensible defaults.</p>
+      </div>
+      <div class="dash-card-body">
+        <ul class="dash-checklist">
+          {% for label in missing_images %}
+          <li><i class="fa-solid fa-image"></i> {{ label }}</li>
+          {% endfor %}
+        </ul>
+        <a class="dash-btn primary mt-3" href="{% url 'dashboard:images' %}">
+          <i class="fa-solid fa-upload"></i> Upload images
+        </a>
+      </div>
+    </section>
+    {% endif %}
+
+    <section class="dash-card">
+      <div class="dash-card-head"><h2>Quick links</h2></div>
+      <div class="dash-card-body">
+        <div class="dash-quick">
+          <a href="{% url 'dashboard:text_blocks' %}"><i class="fa-solid fa-font"></i> Edit website copy</a>
+          <a href="{% url 'dashboard:resource_list' 'menu-items' %}"><i class="fa-solid fa-bars"></i> Manage menus</a>
+          <a href="{% url 'dashboard:images' %}"><i class="fa-solid fa-image"></i> Section images</a>
+          <a href="{% url 'dashboard:settings' %}"><i class="fa-solid fa-sliders"></i> Site settings</a>
+          <a href="{% url 'dashboard:media' %}"><i class="fa-solid fa-folder-open"></i> Media library</a>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "dashboard/base.html" %}
+{% load site_extras %}
+{% block title %}{{ title }}{% endblock %}
+{% block heading %}{{ title }}{% endblock %}
+
+{% block actions %}
+{% if instance.get_absolute_url %}
+<a class="dash-btn ghost" href="{{ instance.get_absolute_url }}" target="_blank" rel="noopener">
+  <i class="fa-solid fa-eye"></i> Preview on website
+</a>
+{% endif %}
+<a class="dash-btn ghost" href="{% url 'dashboard:resource_list' resource.slug %}">
+  <i class="fa-solid fa-arrow-left"></i> Back to {{ resource.plural }}
+</a>
+{% endblock %}
+
+{% block content %}
+<form method="post" enctype="multipart/form-data" class="dash-form" novalidate>
+  {% csrf_token %}
+
+  {% if form.non_field_errors %}
+  <div class="dash-alert error">
+    <i class="fa-solid fa-circle-exclamation"></i>
+    <span>{{ form.non_field_errors|join:" " }}</span>
+  </div>
+  {% endif %}
+
+  {% for group in form.grouped_fields %}
+  <section class="dash-card">
+    <div class="dash-card-head">
+      <h2>{{ group.title }}</h2>
+      {% if group.description %}<p>{{ group.description }}</p>{% endif %}
+    </div>
+    <div class="dash-card-body">
+      {% for field in group.fields %}
+      {% include "dashboard/partials/field.html" with field=field %}
+      {% endfor %}
+    </div>
+  </section>
+  {% endfor %}
+
+  <div class="dash-savebar">
+    <a class="dash-btn ghost" href="{% url 'dashboard:resource_list' resource.slug %}">Cancel</a>
+    <button class="dash-btn primary" type="submit">
+      <i class="fa-solid fa-floppy-disk"></i> {% if instance %}Save changes{% else %}Create {{ resource.label|lower }}{% endif %}
+    </button>
+  </div>
+</form>
+{% endblock %}

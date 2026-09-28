@@ -1,0 +1,24 @@
+<span class="pill"><i class="fa-solid fa-location-dot me-1"></i> {{ TEXT.hero_pill }}</span>
+<h1 class="mt-3">{% if slide.title %}{{ slide.title }}{% else %}{{ TEXT.hero_title }}<br><span class="text-accent">{{ TEXT.hero_accent }}</span>{% endif %}</h1>
+<p class="lead-hero">{{ slide.subtitle|default:TEXT.hero_subtitle }}</p>
+
+<div class="d-flex flex-wrap gap-2 mb-4">
+  {% if slide.cta_label %}
+  <a href="{{ slide.cta_url|default:CONSULT_ANCHOR }}" class="btn btn-accent btn-lg">
+    {{ slide.cta_label }} <i class="fa-solid fa-arrow-right ms-1"></i></a>
+  {% else %}
+  <a href="{{ HERO_CTA }}" class="btn btn-accent btn-lg">
+    {{ TEXT.hero_cta_label }} <i class="fa-solid fa-arrow-right ms-1"></i></a>
+  {% endif %}
+  <a href="{{ SITE.whatsapp_url }}" class="btn btn-glass btn-lg" target="_blank" rel="noopener">
+    <i class="fa-brands fa-whatsapp me-1"></i> {{ TEXT.hero_whatsapp_label }}</a>
+  <a href="{{ HERO_SECONDARY }}" class="btn btn-glass btn-lg">{{ TEXT.hero_secondary_label }}</a>
+</div>
+
+<div class="row g-2 hero-badges">
+  {% for badge in hero_badges %}
+  <div class="col-6 col-md-auto">
+    <div class="glass"><i class="{{ badge.icon }}"></i> {{ badge.text }}</div>
+  </div>
+  {% endfor %}
+</div>

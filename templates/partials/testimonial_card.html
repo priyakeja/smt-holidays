@@ -1,0 +1,19 @@
+{% load site_extras %}<div class="testi">
+  <div class="stars mb-2" aria-label="{{ testimonial.rating }} out of 5">
+    {% for i in "12345" %}
+    <i class="fa-{% if forloop.counter <= testimonial.rating %}solid{% else %}regular{% endif %} fa-star"></i>
+    {% endfor %}
+  </div>
+  <div class="testi-text rich-text">&ldquo;{{ testimonial.review_text|rich }}&rdquo;</div>
+  <div class="d-flex align-items-center gap-3 mt-3">
+    {% if testimonial.customer_image %}
+    <img src="{{ testimonial.customer_image.url }}" class="avatar" alt="{{ testimonial.customer_name }}">
+    {% else %}
+    <span class="avatar">{{ testimonial.initial }}</span>
+    {% endif %}
+    <div>
+      <b>{{ testimonial.customer_name }}</b>
+      {% if testimonial.location %}<br><small class="text-muted">{{ testimonial.location }}</small>{% endif %}
+    </div>
+  </div>
+</div>

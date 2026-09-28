@@ -1,0 +1,24 @@
+<article class="pkg-card">
+  <div class="pkg-img">
+    <img src="{{ package.main_image.url }}" alt="{{ package.title }}" loading="lazy">
+    <span class="tag-dur"><i class="fa-regular fa-calendar"></i> {{ package.duration }}</span>
+    <span class="tag-price">{{ TEXT.packages_price_prefix }}{{ package.price_display }}</span>
+    {% if package.badge %}<span class="tag-badge">{{ package.badge }}</span>{% endif %}
+  </div>
+  <div class="p-4">
+    <h5><a class="pkg-title" href="{{ package.get_absolute_url }}">{{ package.title }}</a></h5>
+    <p class="text-muted small">{{ package.short_description }}</p>
+    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+      <small class="text-muted">{{ TEXT.packages_per_person }}</small>
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-navy btn-sm btn-details" type="button"
+                data-slug="{{ package.slug }}">
+          <i class="fa-regular fa-eye"></i>
+        </button>
+        <a class="btn btn-navy btn-sm" href="{{ package.get_absolute_url }}">
+          {{ TEXT.packages_view_label }} <i class="fa-solid fa-arrow-right ms-1"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</article>

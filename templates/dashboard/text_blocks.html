@@ -1,0 +1,52 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Text &amp; copy{% endblock %}
+{% block heading %}Text &amp; copy{% endblock %}
+
+{% block actions %}
+<a class="dash-btn ghost" href="{% url 'home' %}" target="_blank" rel="noopener">
+  <i class="fa-solid fa-eye"></i> Preview website
+</a>
+{% endblock %}
+
+{% block content %}
+<p class="dash-lede">
+  Every heading, paragraph and button label on the public site. Fields left empty
+  fall back to the built-in default shown in the box, so a page never breaks.
+  Formatting is saved instantly — changes appear on the website on the next page load.
+</p>
+
+<form method="post" class="dash-form" novalidate>
+  {% csrf_token %}
+
+  <nav class="dash-jumps">
+    {% for group in groups %}
+    <a href="#group-{{ forloop.counter }}">{{ group.title }}</a>
+    {% endfor %}
+  </nav>
+
+  {% for group in groups %}
+  <section class="dash-card" id="group-{{ forloop.counter }}">
+    <div class="dash-card-head"><h2>{{ group.title }}</h2></div>
+    <div class="dash-card-body">
+      {% for entry in group.entries %}
+      <div class="dash-field">
+        <label class="dash-label" for="{{ entry.field.id_for_label }}">{{ entry.block.label }}</label>
+        {{ entry.field }}
+        {% if entry.field.help_text %}<div class="dash-help">{{ entry.field.help_text }}</div>{% endif %}
+        {% for error in entry.field.errors %}<div class="dash-error">{{ error }}</div>{% endfor %}
+        <div class="dash-default">
+          <span>Default:</span> {{ entry.block.default|default:"(empty)"|truncatechars:140 }}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endfor %}
+
+  <div class="dash-savebar">
+    <button class="dash-btn primary" type="submit">
+      <i class="fa-solid fa-floppy-disk"></i> Save all copy
+    </button>
+  </div>
+</form>
+{% endblock %}

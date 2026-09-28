@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% load site_extras %}
+{% block title %}{{ TEXT.about_title }} | {{ SITE.site_name }}{% endblock %}
+{% block meta_description %}{{ TEXT.about_paragraph|truncatechars:200 }}{% endblock %}
+
+{% block content %}
+{% include "partials/page_banner.html" with banner_title=TEXT.about_eyebrow banner_subtitle=SITE.tagline banner_image=IMG.about_banner.url %}
+
+<section class="section">
+  <div class="container">
+    <div class="row g-5 align-items-center">
+      <div class="col-lg-6">
+        <h2>{{ TEXT.about_title }}</h2>
+        <div class="text-muted rich-text">{{ TEXT.about_paragraph|rich }}</div>
+        {% if about_points %}
+        <ul class="check-list">
+          {% for point in about_points %}
+          <li><i class="{{ point.icon|default:'fa-solid fa-check' }}"></i> {{ point.text }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+      <div class="col-lg-6">
+        {% if IMG.about_image.url %}
+        <figure class="about-figure">
+          <img src="{{ IMG.about_image.url }}" alt="{{ IMG.about_image.alt }}" loading="lazy">
+          {% if TEXT.about_image_caption %}<figcaption>{{ TEXT.about_image_caption }}</figcaption>{% endif %}
+        </figure>
+        {% endif %}
+        {% if stats %}
+        <div class="row g-3">
+          {% for stat in stats %}
+          <div class="col-6">
+            <div class="stat">
+              {% if stat.number is not None %}
+              <b data-count="{{ stat.number }}" data-suffix="{{ stat.suffix }}">{{ stat.display }}</b>
+              {% else %}
+              <b>{{ stat.display }}</b>
+              {% endif %}
+              <span>{{ stat.label }}</span>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if services %}
+<section class="section bg-soft">
+  <div class="container text-center">
+    <div class="eyebrow">{{ TEXT.why_eyebrow }}</div>
+    <h2 class="mb-5">{{ TEXT.why_title }}</h2>
+    <div class="row g-4 text-start">
+      {% for service in services %}
+      <div class="col-md-6 col-lg-3 reveal">
+        <div class="why">
+          <i class="{{ service.icon }}"></i>
+          <h6>{{ service.title }}</h6>
+          <div class="why-text">{{ service.description|rich }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% if steps %}
+<section class="section">
+  <div class="container text-center">
+    <h2 class="reveal">{{ TEXT.how_title }}</h2>
+    <p class="text-muted mb-5">{{ TEXT.how_subtitle }}</p>
+    <div class="row g-4">
+      {% for step in steps %}
+      <div class="col-md-6 col-lg-3 reveal">
+        <div class="step-card">
+          <span class="step-no">{{ step.number }}</span>
+          <i class="{{ step.icon }}"></i>
+          <h5>{{ step.title }}</h5>
+          <div class="step-text">{{ step.description|rich }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% if testimonials %}
+<section class="section bg-soft">
+  <div class="container text-center">
+    <h2 class="mb-5">{{ TEXT.testimonials_title }}</h2>
+    <div class="row g-4 text-start">
+      {% for testimonial in testimonials %}
+      <div class="col-md-4 reveal">
+        {% include "partials/testimonial_card.html" with testimonial=testimonial %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% if downloads %}
+<section class="section">
+  <div class="container">
+    <h2 class="mb-4">Downloads</h2>
+    <div class="row g-3">
+      {% for file in downloads %}
+      <div class="col-md-6 col-lg-4">
+        <a class="download-card" href="{{ file.file.url }}" download>
+          <i class="fa-solid fa-file-arrow-down"></i>
+          <div>
+            <b>{{ file.title }}</b>
+            {% if file.description %}<small class="d-block text-muted">{{ file.description }}</small>{% endif %}
+            <small class="text-muted">{{ file.extension }} &bull; {{ file.size_display }}</small>
+          </div>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

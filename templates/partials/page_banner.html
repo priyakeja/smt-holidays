@@ -1,0 +1,8 @@
+<section class="page-banner{% if banner_image %} has-image{% endif %}"
+         {% if banner_image %}style="background-image:url('{{ banner_image }}')"{% endif %}>
+  <div class="container">
+    <h1>{{ banner_title }}</h1>
+    {% if banner_subtitle %}<p>{{ banner_subtitle }}</p>{% endif %}
+    {% block banner_extra %}{% endblock %}
+  </div>
+</section>

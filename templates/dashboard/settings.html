@@ -1,0 +1,47 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Site settings{% endblock %}
+{% block heading %}Site settings{% endblock %}
+
+{% block actions %}
+<a class="dash-btn ghost" href="{% url 'home' %}" target="_blank" rel="noopener">
+  <i class="fa-solid fa-eye"></i> Preview website
+</a>
+{% endblock %}
+
+{% block content %}
+<p class="dash-lede">
+  Business identity, contact details and social links. These power the header,
+  footer, contact page, WhatsApp buttons and the pages search engines read.
+</p>
+
+<form method="post" enctype="multipart/form-data" class="dash-form" novalidate>
+  {% csrf_token %}
+
+  {% if form.non_field_errors %}
+  <div class="dash-alert error">
+    <i class="fa-solid fa-circle-exclamation"></i>
+    <span>{{ form.non_field_errors|join:" " }}</span>
+  </div>
+  {% endif %}
+
+  {% for group in form.grouped_fields %}
+  <section class="dash-card">
+    <div class="dash-card-head">
+      <h2>{{ group.title }}</h2>
+      {% if group.description %}<p>{{ group.description }}</p>{% endif %}
+    </div>
+    <div class="dash-card-body">
+      {% for field in group.fields %}
+      {% include "dashboard/partials/field.html" with field=field %}
+      {% endfor %}
+    </div>
+  </section>
+  {% endfor %}
+
+  <div class="dash-savebar">
+    <button class="dash-btn primary" type="submit">
+      <i class="fa-solid fa-floppy-disk"></i> Save settings
+    </button>
+  </div>
+</form>
+{% endblock %}

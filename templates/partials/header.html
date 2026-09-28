@@ -1,0 +1,63 @@
+{% load site_extras %}
+<div class="topbar d-none d-md-block">
+  <div class="container d-flex justify-content-between">
+    <span><i class="fa-solid fa-location-dot me-1"></i> {{ TEXT.topbar_location }}</span>
+    <span class="d-flex align-items-center gap-3">
+      <a href="{{ SITE.call_url }}"><i class="fa-solid fa-phone me-1"></i>{{ SITE.phone_display }}</a>
+      {% for item in TOPBAR_MENU %}
+      <a href="{{ item.get_url }}">{{ item.label }}</a>
+      {% endfor %}
+      <a href="{{ CONSULT_ANCHOR }}" class="btn btn-sm btn-accent py-0">{{ TEXT.topbar_quote_label }}</a>
+    </span>
+  </div>
+</div>
+
+<nav class="navbar navbar-expand-lg site-nav sticky-top" id="nav">
+  <div class="container">
+    <a class="navbar-brand brand" href="{% url 'home' %}">
+      {% if SITE.logo %}
+      <img src="{{ SITE.logo.url }}" alt="{{ SITE.site_name }}" class="brand-logo">
+      {% else %}
+      <span class="brand-mark">{{ SITE.brand_mark }}</span>
+      {% endif %}
+      <span>{{ TEXT.brand_text }}</span>
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#menu" aria-controls="menu" aria-expanded="false"
+            aria-label="Toggle navigation">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <div class="collapse navbar-collapse" id="menu">
+      <ul class="navbar-nav mx-auto gap-lg-2">
+        {% for item in HEADER_MENU %}
+        {% if item.active_children %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="{{ item.get_url }}" role="button"
+             data-bs-toggle="dropdown" aria-expanded="false">{{ item.label }}</a>
+          <ul class="dropdown-menu">
+            {% for child in item.active_children %}
+            <li>
+              <a class="dropdown-item" href="{{ child.get_url }}"
+                 {% if child.is_external %}target="_blank" rel="noopener"{% endif %}>
+                {% if child.icon %}<i class="{{ child.icon }} me-2"></i>{% endif %}{{ child.label }}
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+        </li>
+        {% else %}
+        <li class="nav-item">
+          <a class="nav-link" href="{{ item.get_url }}"
+             {% if item.is_external %}target="_blank" rel="noopener"{% endif %}>
+            {% if item.icon %}<i class="{{ item.icon }} me-1"></i>{% endif %}{{ item.label }}
+          </a>
+        </li>
+        {% endif %}
+        {% endfor %}
+      </ul>
+      <a href="{{ NAV_CTA.url }}" class="btn btn-accent">{{ NAV_CTA.label }}</a>
+    </div>
+  </div>
+</nav>

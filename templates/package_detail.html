@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% load site_extras %}
+{% block title %}{{ package.seo_title|default:package.title }} | {{ SITE.site_name }}{% endblock %}
+{% block meta_description %}{{ package.seo_description|default:package.short_description }}{% endblock %}
+{% block og_image %}<meta property="og:image" content="{{ package.main_image.url }}">{% endblock %}
+
+{% block content %}
+{% include "partials/page_banner.html" with banner_title=package.title banner_subtitle=package.short_description banner_image=IMG.packages_banner.url %}
+
+<section class="section">
+  <div class="container">
+    <nav aria-label="breadcrumb" class="mb-4">
+      <ol class="breadcrumb small">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'packages' %}">Packages</a></li>
+        {% if package.category %}<li class="breadcrumb-item">
+          <a href="{% url 'packages' %}?category={{ package.category|urlencode }}">{{ package.category }}</a>
+        </li>{% endif %}
+        <li class="breadcrumb-item active" aria-current="page">{{ package.title }}</li>
+      </ol>
+    </nav>
+
+    <div class="row g-5">
+      <div class="col-lg-7">
+        <figure class="detail-hero">
+          <img src="{{ package.main_image.url }}" alt="{{ package.title }}">
+          {% if package.badge %}<span class="detail-badge">{{ package.badge }}</span>{% endif %}
+        </figure>
+
+        {% if photos %}
+        <div class="row g-3 mt-4">
+          {% for photo in photos %}
+          <div class="col-4">
+            <a class="detail-thumb" href="{{ photo.image.url }}" target="_blank" rel="noopener">
+              <img src="{{ photo.image.url }}" alt="{{ photo.caption|default:package.title }}" loading="lazy">
+            </a>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if package.overview %}
+        <h3 class="mt-5">About this package</h3>
+        <div class="text-muted rich-text">{{ package.overview|rich }}</div>
+        {% endif %}
+
+        <div class="row g-4 mt-4">
+          {% if package.highlight_list %}
+          <div class="col-md-6">
+            <h6>Highlights</h6>
+            <ul class="tick tick-orange">
+              {% for item in package.highlight_list %}<li>{{ item }}</li>{% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+          {% if package.inclusion_list %}
+          <div class="col-md-6">
+            <h6>Inclusions</h6>
+            <ul class="tick tick-navy">
+              {% for item in package.inclusion_list %}<li>{{ item }}</li>{% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+          {% if package.exclusion_list %}
+          <div class="col-md-6">
+            <h6>Exclusions</h6>
+            <ul class="tick tick-muted">
+              {% for item in package.exclusion_list %}<li>{{ item }}</li>{% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="detail-side">
+          <div class="d-flex align-items-baseline gap-2 flex-wrap">
+            <span class="price-big">{{ TEXT.packages_price_prefix }}{{ package.price_display }}</span>
+            <span class="text-muted small">{{ TEXT.packages_per_person }}</span>
+          </div>
+
+          <ul class="list-unstyled small mt-3 mb-4">
+            <li class="mb-2"><i class="fa-regular fa-clock me-2 text-accent"></i>{{ package.duration }}</li>
+            {% if package.category %}
+            <li class="mb-2"><i class="fa-solid fa-location-dot me-2 text-accent"></i>{{ package.category }}</li>
+            {% endif %}
+            <li class="mb-2"><i class="fa-solid fa-circle-check me-2 text-accent"></i>Customizable itinerary</li>
+            <li><i class="fa-solid fa-headset me-2 text-accent"></i>24/7 on-trip support</li>
+          </ul>
+
+          <a class="btn btn-accent w-100 mb-2" href="{{ CONSULT_ANCHOR }}">
+            <i class="fa-solid fa-paper-plane me-1"></i> {{ TEXT.hero_cta_label }}
+          </a>
+          <a class="btn btn-outline-navy w-100"
+             href="{{ SITE.whatsapp_url }}?text={{ package.title|urlencode }}"
+             target="_blank" rel="noopener">
+            <i class="fa-brands fa-whatsapp me-1"></i> {{ TEXT.consult_whatsapp_label }}
+          </a>
+
+          {% if package.brochure %}
+          <a class="btn btn-light w-100 mt-2" href="{{ package.brochure.url }}" download>
+            <i class="fa-solid fa-file-pdf me-1"></i> Download itinerary
+          </a>
+          {% endif %}
+
+          <hr class="my-4">
+          <div class="small text-muted">
+            <div class="mb-2"><i class="fa-solid fa-phone me-2"></i>
+              <a href="{{ SITE.call_url }}">{{ SITE.phone_display }}</a></div>
+            <div><i class="fa-regular fa-envelope me-2"></i>
+              <a href="mailto:{{ SITE.email }}">{{ SITE.email }}</a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section bg-soft">
+  <div class="container">
+    <div class="consult row g-0">
+      <div class="col-lg-5 consult-left">
+        <div class="eyebrow text-accent">{{ TEXT.consult_eyebrow }}</div>
+        <h2 class="text-white">{{ TEXT.consult_title }}</h2>
+        <div class="rich-text">{{ TEXT.consult_paragraph|rich }}</div>
+      </div>
+      <div class="col-lg-7 p-4 p-lg-5">
+        {% include "partials/enquiry_form.html" with mode="full" source="package enquiry" submit_label=TEXT.consult_submit_label whatsapp_label=TEXT.consult_whatsapp_label %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if related %}
+<section class="section">
+  <div class="container">
+    <h2 class="mb-4">You may also like</h2>
+    <div class="row g-4 text-start">
+      {% for item in related %}
+      <div class="col-md-6 col-lg-4">
+        {% include "partials/package_card.html" with package=item %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

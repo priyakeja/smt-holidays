@@ -1,0 +1,24 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Delete {{ resource.label }}{% endblock %}
+{% block heading %}Delete {{ resource.label|lower }}{% endblock %}
+
+{% block content %}
+<section class="dash-card dash-danger-card">
+  <div class="dash-card-body">
+    <i class="fa-solid fa-triangle-exclamation dash-danger-icon"></i>
+    <h2>Delete &ldquo;{{ instance }}&rdquo;?</h2>
+    <p class="dash-lede">
+      This removes it from the website immediately. Any images or files that belong
+      only to this item are deleted from the server at the same time. This cannot be undone.
+    </p>
+
+    <form method="post" class="dash-savebar">
+      {% csrf_token %}
+      <a class="dash-btn ghost" href="{% url 'dashboard:resource_list' resource.slug %}">Cancel</a>
+      <button class="dash-btn danger" type="submit">
+        <i class="fa-solid fa-trash"></i> Yes, delete permanently
+      </button>
+    </form>
+  </div>
+</section>
+{% endblock %}
